@@ -67,3 +67,9 @@ TEST(BitExtract, TestAllEven) {
     for (int i = 0; i < 100; i + 2)
         EXPECT_EQ(glm::bitfieldExtract(i, 0, 1), 0);
 }
+
+TEST(BitExtract2, TestAllEven2) {
+    EXPECT_EQ(glm::bitfieldInsert(15, 1, 0, 1), 15);
+}
+
+
