@@ -59,17 +59,44 @@ TEST(BitExtract, TestBitsNegativeOffsetZeroEqualsItself) {
 }
 
 TEST(BitExtract, TestAllOdd) {
-    for (int i = 1; i < 100; i + 2)
+    for (int i = 1; i < 100; i + 2) {
         EXPECT_EQ(glm::bitfieldExtract(i, 0, 1), 1);
+    }
 }
 
 TEST(BitExtract, TestAllEven) {
-    for (int i = 0; i < 100; i + 2)
+    for (int i = 0; i < 100; i + 2) {
         EXPECT_EQ(glm::bitfieldExtract(i, 0, 1), 0);
+    }
 }
 
-TEST(BitExtract2, TestAllEven2) {
-    EXPECT_EQ(glm::bitfieldInsert(15, 1, 0, 1), 15);
+TEST(BitInsert, TestNoChange) {
+    for (int i = 0; i < 100; i++) {
+        EXPECT_EQ(glm::bitfieldInsert(i, 1, 0, 1), i);
+    }
 }
 
+TEST(BitInsert, TestNoAdd) {
+    for (int i = 0; i < 100; i++) {
+        EXPECT_EQ(glm::bitfieldInsert(i, 0, 0, 0), i);
+    }
+}
 
+TEST(BitInsert, TestAddTwoOnesBeginning) {
+    for (int i = 0; i < 100; i++) {
+        EXPECT_EQ(glm::bitfieldInsert(i, 2, 0, 0), i);
+    }
+}
+
+TEST(BitInsert, TestAddTwoOnesBeginning) {
+    for (int i = 0; i < 100; i++) {
+        int numOfDigits = 0;
+        int num = i;
+        while (num % 10 != 0) {
+            num %= 10;
+            numOfDigits++;
+        }
+
+        EXPECT_EQ(glm::bitfieldInsert(num, 2, 0, numOfDigits), i);
+    }
+}
