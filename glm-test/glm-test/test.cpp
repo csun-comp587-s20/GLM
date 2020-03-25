@@ -88,7 +88,7 @@ TEST(BitInsert, TestAddTwoOnesBeginning) {
     }
 }
 
-TEST(BitInsert, TestAddTwoOnesBeginning) {
+TEST(BitInsert, TestAddTwoOnesEnd) {
     for (int i = 0; i < 100; i++) {
         int numOfDigits = 0;
         int num = i;
