@@ -204,3 +204,5 @@ TEST(BitMSB, MSBOfZeroIsNegativeOne) {
 TEST(BitMSB, MSBOfOneIsZero) {
     EXPECT_EQ(0, glm::findMSB(1));
 }
+
+//
