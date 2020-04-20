@@ -16,6 +16,7 @@ int countBits(int num) {
     return count;
 }
 
+/* Integer functions */
 TEST(BitCount, TestZero) {
     EXPECT_EQ(glm::bitCount(0), 0);
 }
@@ -100,7 +101,7 @@ TEST(BitInsert, TestAddOneMostSignificantBit) {
         mask <<= numOfBits - 1;
 
         int num = glm::bitfieldInsert(i, 1, numOfBits - 1, 1);
-       
+
         EXPECT_EQ(num & mask, (int)pow(2, numOfBits - 1));//Bitwise AND should leave only most significant bit set
     }
 }
@@ -110,43 +111,31 @@ TEST(BitInsert, InsertAllOnes) {
     for (int i = 0; i < 1000; i++) {
         int numOfBits = countBits(i);
         int num = glm::bitfieldInsert(i, numAllOnes, 0, numOfBits);
-       
+
         EXPECT_EQ(num + 1, (int)pow(2, numOfBits));//Adding 1 should zero everything and add 1 at the most significant bit
     }
 }
 
-//TEST(BitInsert, InsertRandomNumberAtRandomIndex) {//TODO
-//    srand(time(NULL));
-//    
-//    int base = INT_MAX;//Any number can be inserted within this number
-//    int insert = rand() % INT_MAX;//Generate any random positive number
-//    int numOfBits = countBits(insert);
-//    int randOffset = rand() % (33 - numOfBits);
-//    
-//    //base = 31;//11111
-//    //insert = 5;//101
-//    //numOfBits = 3;
-//    //randOffset = 2;
-//    ////mask should be 1110
-//    ////10111
-//    
-//    int res = glm::bitfieldInsert(base, insert, randOffset, numOfBits);
-//    cout << randOffset << " " << numOfBits << " " << insert;
-//    int mask = 0;
-//    for (int i = randOffset; i < randOffset + numOfBits; i++) {
-//        mask = (mask << 1) + 1;
-//    }
-//
-//    mask <<= randOffset;
-//    cout << '\n' << mask << " " << res;
-//    int x = 2130710527;
-//    int y = 33550336;
-//    int bla = x & y;
-//    cout << '\n' << bla;
-//    EXPECT_EQ(insert, (res & mask) >> 2);
-//}
+TEST(BitInsert, InsertRandomNumberAtRandomIndex) {
+    srand(time(NULL));
 
-TEST(BitLSB, LSBZeroNegativeOne) {
+    int base = INT_MAX;//Any number can be inserted within this number
+    int insert = rand() % INT_MAX;//Generate any random positive number
+    int numOfBits = countBits(insert);
+    int randOffset = rand() % (33 - numOfBits);
+
+    int mask = insert;
+
+    for (int i = 0; i < randOffset; i++) {
+        mask = (mask << 1) + 0;
+    }
+
+    int res = glm::bitfieldInsert(base, insert, randOffset, numOfBits);
+
+    EXPECT_EQ(insert, (res & mask) >> randOffset);
+}
+
+TEST(BitLSB, LSBZeroEqualsNegativeOne) {
     EXPECT_EQ(-1, glm::findLSB(0));
 }
 
@@ -159,7 +148,7 @@ TEST(BitLSB, LSBPowerOfTwo) {
 
     for (int i = 0; i < 100; i++) {
         int exp = rand() % 10;
-        
+
         EXPECT_EQ(exp, glm::findLSB((int)pow(2, exp)));
     }
 }
@@ -205,4 +194,113 @@ TEST(BitMSB, MSBOfOneIsZero) {
     EXPECT_EQ(0, glm::findMSB(1));
 }
 
-//
+TEST(BitMSB, MSBOfPowerTwo) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int exp = rand() % 10;
+
+        EXPECT_EQ(exp, glm::findMSB((int)pow(2, exp)));
+    }
+}
+
+TEST(BitMSB, MSBFloatingOne) {//Shift 1 between 0 to 32 times and verify its MSB is the number of shifts
+    for (int j = 0; j < 32; j++) {
+        int numOfShifts = j;
+        int num = 1;
+        for (int i = 0; i < numOfShifts; i++) {
+            num = (num << 1);
+        }
+
+        EXPECT_EQ(numOfShifts, glm::findMSB(num));
+    }
+}
+
+TEST(BitMSB, MSBOfAllOnes) {//Set number to all ones for every possible length between 0 and 32 digits and verify MSB
+    for (int j = 0; j < 33; j++) {
+        int numOfOnes = j;
+        int num = 0;
+        for (int i = 0; i < numOfOnes; i++) {
+            num = (num << 1) + 1;
+        }
+
+        EXPECT_EQ(numOfOnes - 1, glm::findMSB(num));
+    }
+}
+
+TEST(BitMSB, MSBOfRandomEqualsNumberOfBits) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randNum = rand() % INT_MAX;
+
+        int numOfBits = countBits(randNum);
+
+        EXPECT_EQ(numOfBits, glm::findMSB(randNum) + 1);
+    }
+}
+
+/* Common functions */
+TEST(ABS, AbsOfZeroIsZero) {
+    EXPECT_EQ(0, glm::abs(0));
+}
+
+TEST(ABS, AbsOfRandomNegative) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randNum = (rand() % INT_MAX);
+        int neg = -1 * randNum;
+
+        EXPECT_EQ(randNum, glm::abs(neg));
+    } 
+}
+
+TEST(ABS, AbsOfOddPowerIsPositive) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randNum = (rand() % INT_MAX);
+        int neg = -1 * randNum;
+
+        EXPECT_TRUE(glm::abs(pow(neg, 3)) > 0);
+    }
+}
+
+TEST(Ceil, CeilOfZeroIsZero) {
+    EXPECT_EQ(0, glm::ceil(0));
+}
+
+TEST(Ceil, CeilOfIntIsItself) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randNum = rand() % INT_MAX;
+
+        EXPECT_EQ(randNum, glm::ceil(randNum));
+    }
+}
+
+TEST(ceil, CeilOfNegativeIntIsItself) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randNum = rand() % INT_MAX;
+        randNum = randNum * -1;
+        EXPECT_EQ(randNum, glm::ceil(randNum));
+    }
+}
+
+TEST(ceil, CeilOfRandomFloat) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        double randAfterDecimal = rand() % INT_MAX;
+
+        while (randAfterDecimal > 1) {
+            randAfterDecimal /= 10;
+        }
+
+        EXPECT_EQ(1, glm::ceil(randAfterDecimal));
+    }
+}
