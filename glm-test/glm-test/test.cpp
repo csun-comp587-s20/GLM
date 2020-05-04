@@ -304,3 +304,103 @@ TEST(ceil, CeilOfRandomFloat) {
         EXPECT_EQ(1, glm::ceil(randAfterDecimal));
     }
 }
+
+TEST(ceil, CeilToIntMax) {
+    int max = INT_MAX - 1;
+    
+    EXPECT_EQ(glm::ceil(max + 0.6), INT_MAX);
+}
+
+TEST(clamp, allEqualElementsReturnsElement) {// Computes min(max(param1, param2), param3) 
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randNum = rand() % INT_MAX;
+        EXPECT_EQ(randNum, glm::clamp(randNum, randNum, randNum));
+    }
+}
+
+TEST(clamp, comprateToMathMinMax) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int num1 = rand() % INT_MAX;
+        int num2 = rand() % INT_MAX;
+        int num3 = rand() % INT_MAX;
+        EXPECT_EQ(glm::clamp(num1, num2, num3), min(max(num1, num2), num3));
+    }
+}
+
+TEST(clamp, comprateToMathMinMaxWithNegatives) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 1; i++) {
+        int randNegativeRange = rand() % INT_MAX;//Used to generate a range so the number can be either positive or negative
+        int num1 = rand() % INT_MAX - randNegativeRange;
+        int num2 = rand() % INT_MAX - randNegativeRange;
+        int num3 = rand() % INT_MAX - randNegativeRange;
+        
+        EXPECT_EQ(glm::clamp(num1, num2, num3), min(max(num1, num2), num3));
+    }
+}
+
+TEST(floor, floorOfZeroIsZero) {
+    EXPECT_EQ(0, glm::floor(0));
+}
+
+TEST(floor, floorOfValuesAboveHalfRoundDown) {//Values like 0.5, 0.6, 0.7, 0.8, 0.9 should all round to 0
+    srand(time(NULL));
+    int base = rand() % INT_MAX;
+
+    for (int i = 0; i < 10; i++) {
+        EXPECT_EQ(base, glm::floor(base + (i / 10)));
+    }
+}
+
+TEST(floor, floorOfValuesAboveHalfRoundDownWithNegativeBase) {
+    srand(time(NULL));
+    int base = rand() % INT_MAX - INT_MAX;
+
+    for (int i = 0; i < 10; i++) {
+        EXPECT_EQ(base, glm::floor(base + (i / 10)));
+    }
+}
+
+TEST(fract, fractOfZeroIsZero) {
+        EXPECT_EQ(0, glm::fract(0.0));
+}
+
+TEST(fract, fractOfIntIsZero) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int randInt = rand() % INT_MAX;
+        
+        EXPECT_EQ(0, glm::fract(randInt * 1.0));
+    }
+}
+
+TEST(fract, randomGeneratedFract) {//Generates random base abd random fraction. Verifies no base can affect the result
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int base = rand() % 10;//Small base so all numbers after decimal are accounted for
+        float fraction = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);//Random between 0.0 and 1.0
+        
+        EXPECT_EQ(fraction, glm::fract(base * 1.0 + fraction));
+    }
+}//Fract was tested with negative numbers and found issues.
+
+TEST(isInf, infinityGivesTrue) {
+    EXPECT_TRUE(glm::isinf(std::numeric_limits<double>::infinity()));
+}
+
+TEST(isInf, intIsNotInfinity) {
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        double randNum = rand() % INT_MAX;
+
+        EXPECT_FALSE(glm::isinf(randNum));
+    }
+}
