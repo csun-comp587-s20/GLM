@@ -121,7 +121,7 @@ TEST(BitInsert, InsertRandomNumberAtRandomIndex) {
 
     for (int i = 0; i < 100; i++) {
         int base = INT_MAX;//Any number can be inserted within this number
-        int insert = rand() % (INT_MAX / 2);//Generate any random positive number
+        int insert = rand() % (INT_MAX);//Generate any random positive number
         int numOfBits = countBits(insert);
         int randOffset = rand() % (32 - numOfBits);
 
