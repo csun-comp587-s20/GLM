@@ -119,20 +119,22 @@ TEST(BitInsert, InsertAllOnes) {
 TEST(BitInsert, InsertRandomNumberAtRandomIndex) {
     srand(time(NULL));
 
-    int base = INT_MAX;//Any number can be inserted within this number
-    int insert = rand() % INT_MAX;//Generate any random positive number
-    int numOfBits = countBits(insert);
-    int randOffset = rand() % (33 - numOfBits);
+    for (int i = 0; i < 100; i++) {
+        int base = INT_MAX;//Any number can be inserted within this number
+        int insert = rand() % (INT_MAX / 2);//Generate any random positive number
+        int numOfBits = countBits(insert);
+        int randOffset = rand() % (32 - numOfBits);
 
-    int mask = insert;
+        int mask = insert;
 
-    for (int i = 0; i < randOffset; i++) {
-        mask = (mask << 1) + 0;
+        for (int i = 0; i < randOffset; i++) {
+            mask = (mask << 1) + 0;
+        }
+
+        int res = glm::bitfieldInsert(base, insert, randOffset, numOfBits);
+
+        EXPECT_EQ(insert, (res & mask) >> randOffset);
     }
-
-    int res = glm::bitfieldInsert(base, insert, randOffset, numOfBits);
-
-    EXPECT_EQ(insert, (res & mask) >> randOffset);
 }
 
 TEST(BitLSB, LSBZeroEqualsNegativeOne) {
@@ -402,5 +404,110 @@ TEST(isInf, intIsNotInfinity) {
         double randNum = rand() % INT_MAX;
 
         EXPECT_FALSE(glm::isinf(randNum));
+
+    }
+}
+
+TEST(Max, maxOfEquals) {
+    srand(time(NULL));
+
+    int num = rand() % INT_MAX;
+    EXPECT_EQ(num, glm::max(num, num));
+}
+
+TEST(Max, maxOfNumAndItsSubsequent) {
+    srand(time(NULL));
+
+    int num = rand() % INT_MAX;
+    EXPECT_EQ(num + 1, glm::max(num, num + 1));
+}
+
+TEST(Max, orderOfParamsDoesNotMatter) {//max(x, y) == max(y, x)
+    srand(time(NULL));
+
+    int num1 = rand() % INT_MAX;
+    int num2 = rand() % INT_MAX;
+
+    EXPECT_EQ(glm::max(num1, num2), glm::max(num2, num1));
+}
+
+TEST(Max, maxVSImplementedMax) {
+    srand(time(NULL));
+
+    int num1 = rand() % INT_MAX;
+    int num2 = rand() % INT_MAX;
+
+    if (num1 > num2) {
+        EXPECT_EQ(num1, glm::max(num1, num2));
+    }
+    else {
+        EXPECT_EQ(num2, glm::max(num1, num2));
+    }
+}
+
+TEST(Min, minOfSameNumIsNum) {
+    srand(time(NULL));
+
+    int num1 = rand() % INT_MAX;
+
+    EXPECT_EQ(num1, glm::min(num1, num1));
+}
+
+TEST(Min, minOfNumAndItsSubsequent) {
+    srand(time(NULL));
+
+    int num = rand() % INT_MAX;
+    EXPECT_EQ(num, glm::min(num, num + 1));
+}
+
+TEST(Min, orderOfParamsDoesNotMatter) {//min(x, y) == min(y, x)
+    srand(time(NULL));
+
+    int num1 = rand() % INT_MAX;
+    int num2 = rand() % INT_MAX;
+
+    EXPECT_EQ(glm::min(num1, num2), glm::min(num2, num1));
+}
+
+TEST(Min, minVSImplementedMin) {
+    srand(time(NULL));
+
+    int num1 = rand() % INT_MAX;
+    int num2 = rand() % INT_MAX;
+
+    if (num1 > num2) {
+        EXPECT_EQ(num2, glm::min(num1, num2));
+    }
+    else {
+        EXPECT_EQ(num1, glm::min(num1, num2));
+    }
+}
+
+TEST(Mod, modOfOneIsZero) {
+    srand(time(NULL));
+
+    int num1 = rand() % INT_MAX;
+    EXPECT_EQ(0, glm::mod(num1 * 1.0, 1.0));
+}
+
+TEST(Mod, modVSSTDMod) {//Compared against the Math mod of standard library
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int num1 = rand() % INT_MAX;
+        int divider = rand() % INT_MAX;
+
+        EXPECT_EQ(num1 % divider, glm::mod(num1 * 1.0, divider * 1.0));
+    }
+}
+
+TEST(Mod, modVSImplementedMod) {//Compared against mod formula
+    srand(time(NULL));
+
+    for (int i = 0; i < 100; i++) {
+        int num1 = rand() % INT_MAX;
+        int divider = rand() % INT_MAX;
+
+        EXPECT_EQ(num1 - divider * floor(num1/ divider), glm::mod(num1 * 1.0, divider * 1.0));
     }
 }
